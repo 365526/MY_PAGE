@@ -5,47 +5,52 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>김소희 자기소개</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- 링크 미리보기(Open Graph) -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="김소희 자기소개">
+  <meta property="og:description" content="HTML·FastAPI 연동 자기소개 페이지">
+  <meta property="og:image" content="https://api.dicebear.com/10.x/bottts/png?seed=2xmdf733&size=256">
+  <meta property="og:url" content="https://my-page-ochre-five.vercel.app">
 </head>
 <body>
   <header>
-    <h1>안녕하세요, 김소희입니다🧑🏻‍💻</h1>
+    <h1>안녕하세요, 김소희입니다 🧑🏻‍💻</h1>
     <button id="theme-btn">🌙 다크모드</button>
   </header>
 
-<p id="api-status" class="api-status">서버에서 소개 정보를 불러오는 중…</p>
+  <p id="api-status" class="api-status">서버에서 소개 정보를 불러오는 중…</p>
 
-<main class="cards">
-  <article class="card">
-    <img
-  src="https://api.dicebear.com/10.x/bottts/svg?seed=2xmdf733"
-  alt="프로필 일러스트"
-  width="100" height="100"/>
-    <h2 id="name"></h2>
-    <p class="role" id="profile-role"></p>
-    <p id="profile-intro"></p>
-  </article>
+  <main class="cards">
+    <article class="card">
+      <img src="https://api.dicebear.com/10.x/bottts/svg?seed=2xmdf733"
+           alt="프로필 일러스트" width="100" height="100">
+      <h2 id="name"></h2>
+      <p class="role" id="profile-role"></p>
+      <p id="profile-intro"></p>
+    </article>
 
-  <article class="card">
-    <div class="card-icon">🎓</div>
-    <h2>관심 연구 주제</h2>
-    <p class="role" id="interest-role"></p>
-    <p class="list" id="interest-list"></p>
-  </article>
+    <article class="card">
+      <div class="card-icon">🎓</div>
+      <h2>관심 연구 주제</h2>
+      <p class="role" id="interest-role"></p>
+      <p class="list" id="interest-list"></p>
+    </article>
 
-  <article class="card">
-    <div class="card-icon">🗺️</div>
-    <h2>학기 프로젝트</h2>
-    <p class="role" id="project-role"></p>
-    <p><span id="project-desc"></span><br><strong id="project-highlight"></strong></p>
-  </article>
+    <article class="card">
+      <div class="card-icon">🗺️</div>
+      <h2>학기 프로젝트</h2>
+      <p class="role" id="project-role"></p>
+      <p><span id="project-desc"></span><br><strong id="project-highlight"></strong></p>
+    </article>
 
-  <article class="card">
-    <div class="card-icon">🎯</div>
-    <h2>이번 학기 목표</h2>
-    <p class="role" id="goal-role"></p>
-    <p><span id="goal-desc"></span><br><strong id="goal-highlight"></strong></p>
-  </article>
-</main>
+    <article class="card">
+      <div class="card-icon">🎯</div>
+      <h2>이번 학기 목표</h2>
+      <p class="role" id="goal-role"></p>
+      <p><span id="goal-desc"></span><br><strong id="goal-highlight"></strong></p>
+    </article>
+  </main>
 
   <footer>
     <p>정보영재교수학습프로그램개발 과제</p>
