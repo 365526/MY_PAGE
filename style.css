@@ -69,3 +69,6 @@ body.dark .card { background: #2b2b2b; }
   header { flex-direction: column; gap: 12px; padding: 20px; } /* [새로 추가] 좌우 여백 20px */
   .cards { grid-template-columns: 1fr; padding: 20px; } /* [추가] 카드 1열 */
 }
+
+.api-status { text-align: center; color: #888; font-size: 0.9rem; }
+#profile-intro, #interest-list { white-space: pre-line; }
