@@ -1,0 +1,71 @@
+* { box-sizing: border-box; margin: 0; }
+
+:root {
+  --brand: #2f6f6a;
+  --bg: #f4f4f0;
+}
+
+body {
+  font-family: sans-serif;
+  background: var(--bg);
+  color: #1a2230;
+  transition: background 0.3s, color 0.3s; /* 배경·글자색 부드럽게 전환 */
+}
+
+/* 로고와 버튼을 양끝으로 */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+}
+
+/* [추가] 제목: 줄바꿈 없이 창 너비에 맞춰 글자 크기 조절 */
+header h1 {
+  white-space: nowrap;
+  font-size: clamp(1.25rem, 5vw, 2rem);
+}
+
+/* [변경] flex → grid: 창 너비를 4등분해 카드가 함께 늘어남 */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 20px 40px; /* [변경] 좌우 40px로 헤더와 양끝 맞춤 */
+}
+
+/* [추가] 아주 넓은 화면에서 헤더와 카드가 과하게 벌어지지 않도록 최대 너비 */
+header, .cards { max-width: 1200px; margin: 0 auto; }
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  /* [삭제] width: 240px; → 너비는 grid가 결정 */
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.2s;
+  word-break: keep-all; /* [추가] 단어 단위 줄바꿈 */
+}
+.card:hover { transform: translateY(-6px); }
+.card img { border-radius: 50%; }
+.card .card-icon { font-size: 60px; } /* 2,3,4번 카드 이모지 크기 */
+.card .role { color: var(--brand); font-weight: bold; margin: 8px 0; }
+.card .list { display: inline-block; text-align: left; }
+
+footer { text-align: center; padding: 30px; color: #888; } /* 바닥글: 가운데 정렬 */
+
+/* 다크모드 */
+body.dark { background: #1a1a1a; color: #eee; }
+body.dark .card { background: #2b2b2b; }
+
+/* [추가] 중간 화면: 카드 2열 (2×2) */
+@media (max-width: 900px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* 좁은 화면: 헤더와 카드를 세로로 쌓기 */
+@media (max-width: 600px) {
+  header { flex-direction: column; gap: 12px; padding: 20px; } /* [새로 추가] 좌우 여백 20px */
+  .cards { grid-template-columns: 1fr; padding: 20px; } /* [추가] 카드 1열 */
+}
