@@ -5,44 +5,155 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>중간발표 자료</title>
   <style>
-    body { margin: 0; background: #111; color: #fff; font-family: sans-serif;
-           display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-    header { width: 100%; max-width: 1100px; padding: 1rem; display: flex; justify-content: space-between; }
-    header a { color: #93c5fd; text-decoration: none; }
-    #slide { width: 95%; max-width: 1100px; border-radius: 6px; }
-    nav { margin: 1rem; display: flex; gap: 1rem; align-items: center; }
-    button { padding: .5rem 1.2rem; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; }
+    * { box-sizing: border-box; margin: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;          /* 스크롤 없음 */
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      user-select: none;         /* 클릭할 때 글자·이미지 선택 방지 */
+    }
+
+    /* 슬라이드: 화면에 맞춰 잘림 없이 최대 크기 */
+    #slide {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    /* 마우스를 움직일 때만 잠깐 보이는 안내 요소 */
+    .ui {
+      position: fixed;
+      z-index: 10;
+      padding: 6px 12px;
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.55);
+      font-size: 0.9rem;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    body.show-ui .ui { opacity: 1; pointer-events: auto; }
+
+    /* 원형 화살표 커서: 왼쪽 절반은 이전(◀), 오른쪽 절반은 다음(▶) */
+    body.cur-prev #slide {
+      cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><circle cx='24' cy='24' r='21' fill='rgba(0,0,0,0.45)' stroke='white' stroke-width='2.5'/><path d='M28 15l-9 9 9 9' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 24 24, w-resize;
+    }
+    body.cur-next #slide {
+      cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><circle cx='24' cy='24' r='21' fill='rgba(0,0,0,0.45)' stroke='white' stroke-width='2.5'/><path d='M20 15l9 9-9 9' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 24 24, e-resize;
+    }
+
+    /* 창이 작을 때: 커서 32px로 축소 */
+    @media (max-width: 1000px), (max-height: 650px) {
+      body.cur-prev #slide {
+        cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 48 48'><circle cx='24' cy='24' r='21' fill='rgba(0,0,0,0.45)' stroke='white' stroke-width='2.5'/><path d='M28 15l-9 9 9 9' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 16 16, w-resize;
+      }
+      body.cur-next #slide {
+        cursor: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 48 48'><circle cx='24' cy='24' r='21' fill='rgba(0,0,0,0.45)' stroke='white' stroke-width='2.5'/><path d='M20 15l9 9-9 9' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'/></svg>") 16 16, e-resize;
+      }
+    }
+
+    /* 2초간 움직임 없으면 커서 숨김 (위 규칙보다 뒤에 있어야 적용됨) */
+    body.hide-cursor, body.hide-cursor #slide { cursor: none; }
+
+    #back  { top: 12px; left: 12px; color: #93c5fd; text-decoration: none; }
+    #count { bottom: 12px; right: 12px; }
+    #hint  { bottom: 12px; left: 12px; color: #bbb; }
+
+    @media (max-width: 600px) { #hint { display: none; } }
   </style>
 </head>
 <body>
-  <header>
-    <a href="index.html">← 자기소개로 돌아가기</a>
-    <span>중간발표</span>
-  </header>
-  <img id="slide" alt="발표 슬라이드">
-  <nav>
-    <button id="prev">이전</button>
-    <span id="count"></span>
-    <button id="next">다음</button>
-  </nav>
+  <img id="slide" alt="발표 슬라이드" draggable="false">
+
+  <a id="back" class="ui" href="index.html">← 자기소개로 돌아가기</a>
+  <div id="count" class="ui"></div>
+  <div id="hint" class="ui">← → 이동 · 클릭 좌/우 · F 전체화면</div>
+
   <script>
-    const TOTAL = 3;                       // 슬라이드 장수로 수정
+    const TOTAL = 3;   // 슬라이드 장수로 수정
     const path = n => `slides/midterm/${String(n).padStart(2, '0')}.png`;
-    let cur = 1;
+
     const img = document.getElementById('slide');
     const count = document.getElementById('count');
+
+    // 주소 끝 #번호로 시작 장 지정 (새로고침해도 보던 장 유지)
+    let cur = parseInt(location.hash.slice(1)) || 1;
+
     function show(n) {
       cur = Math.min(Math.max(n, 1), TOTAL);
       img.src = path(cur);
+      img.alt = `슬라이드 ${cur}`;
       count.textContent = `${cur} / ${TOTAL}`;
+      history.replaceState(null, '', `#${cur}`);
+      // 앞뒤 장을 미리 불러와서 넘길 때 깜빡임 방지
+      [cur - 1, cur + 1].forEach(i => {
+        if (i >= 1 && i <= TOTAL) new Image().src = path(i);
+      });
     }
-    document.getElementById('prev').onclick = () => show(cur - 1);
-    document.getElementById('next').onclick = () => show(cur + 1);
+
+    // 키보드
     document.addEventListener('keydown', e => {
-      if (e.key === 'ArrowLeft') show(cur - 1);
-      if (e.key === 'ArrowRight') show(cur + 1);
+      if (['ArrowRight', 'ArrowDown', 'PageDown', ' ', 'Enter'].includes(e.key)) {
+        e.preventDefault(); show(cur + 1);
+      } else if (['ArrowLeft', 'ArrowUp', 'PageUp', 'Backspace'].includes(e.key)) {
+        e.preventDefault(); show(cur - 1);
+      } else if (e.key === 'Home') {
+        show(1);
+      } else if (e.key === 'End') {
+        show(TOTAL);
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+        else document.exitFullscreen();
+      }
     });
-    show(1);
+
+    // 마우스 클릭: 화면 왼쪽 절반은 이전, 오른쪽 절반은 다음
+    img.addEventListener('click', e => {
+      if (e.clientX < window.innerWidth / 2) show(cur - 1);
+      else show(cur + 1);
+    });
+
+    // 휴대폰: 좌우로 밀어서 넘기기
+    let startX = null;
+    img.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    img.addEventListener('touchend', e => {
+      if (startX === null) return;
+      const dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 40) show(dx < 0 ? cur + 1 : cur - 1);
+      startX = null;
+    });
+
+    // 마우스를 움직이면 안내 요소 표시, 2초 뒤 숨김
+    let timer;
+    function wake() {
+      document.body.classList.add('show-ui');
+      document.body.classList.remove('hide-cursor');
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        document.body.classList.remove('show-ui');
+        document.body.classList.add('hide-cursor');
+      }, 2000);
+    }
+    document.addEventListener('mousemove', wake);
+    document.addEventListener('touchstart', wake, { passive: true });
+
+    // 마우스 위치에 따라 커서 모양 바꾸기 (클릭 영역과 같은 기준: 화면 절반)
+    function updateCursor(x) {
+      const left = x < window.innerWidth / 2;
+      document.body.classList.toggle('cur-prev', left);
+      document.body.classList.toggle('cur-next', !left);
+    }
+    document.addEventListener('mousemove', e => updateCursor(e.clientX));
+    updateCursor(window.innerWidth);   // 처음엔 ▶ 커서로 시작
+
+    show(cur);
+    wake();
   </script>
 </body>
 </html>
