@@ -44,7 +44,7 @@ header, .cards { max-width: 1200px; margin: 0 auto; }
   /* [삭제] width: 240px; → 너비는 grid가 결정 */
   text-align: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s; /* [변경] 그림자도 부드럽게 전환 */
   word-break: keep-all; /* [추가] 단어 단위 줄바꿈 */
 }
 .card:hover { transform: translateY(-6px); }
@@ -53,11 +53,36 @@ header, .cards { max-width: 1200px; margin: 0 auto; }
 .card .role { color: var(--brand); font-weight: bold; margin: 8px 0; }
 .card .list { display: inline-block; text-align: left; }
 
+/* [추가] 학기 프로젝트 카드: 클릭하면 발표 페이지(midterm.html)로 이동 */
+.card-link {
+  display: block;
+  color: inherit;          /* 링크 파란색 제거, 다크모드 글자색 그대로 */
+  text-decoration: none;   /* 밑줄 제거 */
+  border-radius: 12px;     /* 키보드 포커스 테두리를 카드 모양에 맞춤 */
+}
+.card-link .card {
+  height: 100%;            /* grid 안에서 다른 카드와 높이 맞춤 */
+  cursor: pointer;
+}
+.card-link:hover .card { box-shadow: 0 10px 22px rgba(0,0,0,0.15); } /* 클릭 가능한 카드 강조 */
+.card-link:focus-visible { outline: 3px solid var(--brand); outline-offset: 3px; } /* Tab 키 이동 시 표시 */
+
+/* [추가] 카드 하단 안내 문구 */
+.card .card-more {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--brand);
+  opacity: 0.8;
+}
+.card-link:hover .card-more { opacity: 1; }
+
 footer { text-align: center; padding: 30px; color: #888; } /* 바닥글: 가운데 정렬 */
 
 /* 다크모드 */
 body.dark { background: #1a1a1a; color: #eee; }
 body.dark .card { background: #2b2b2b; }
+body.dark .card-more { color: #7fc4bd; } /* [추가] 어두운 배경에서 잘 보이도록 밝은 청록 */
 
 /* [추가] 중간 화면: 카드 2열 (2×2) */
 @media (max-width: 900px) {
